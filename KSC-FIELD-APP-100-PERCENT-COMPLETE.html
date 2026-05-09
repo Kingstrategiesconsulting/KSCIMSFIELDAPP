@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KSC Field App - Complete</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --ksc-primary: #3d2817;
+            --ksc-secondary: #6d5742;
+            --ksc-accent: #d4c6b8;
+            --ksc-light: #eee4db;
+            --bg-cream: #f5f0ea;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-cream);
+            color: var(--ksc-primary);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--ksc-primary) 0%, #2a1a0f 100%);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-section { 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+        }
+        .logo-circle {
+            width: 56px;
+            height: 56px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 300;
+            font-size: 1rem;
+            color: var(--ksc-primary);
+            letter-spacing: 3px;
+        }
+        .app-title h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .app-title p {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: none;
+            font-weight: 500;
+        }
+        .back-btn.visible { display: block; }
+        .content {
+            padding: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+        .action-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+            text-align: center;
+        }
+        .action-card:active { transform: scale(0.98); }
+        .action-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border-color: var(--ksc-primary);
+        }
+        .card-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--ksc-primary);
+        }
+        .card-description {
+            font-size: 0.875rem;
+            color: var(--ksc-secondary);
+            line-height: 1.5;
+        }
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--ksc-primary);
+        }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--ksc-secondary);
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1px solid #e7e5e4;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .form-select {
+            background: white;
+            cursor: pointer;
+        }
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--ksc-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .radio-item:hover { background: var(--ksc-accent); }
+        .radio-item input[type="radio"] {
+            width: 20px;
+            height: 20px;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--ksc-light);
+            border-radius: 8px;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        .checkbox-item label {
+            margin: 0;
+            font-size: 0.9375rem;
+            cursor: pointer;
+        }
+        .conditional-section {
+            display: none;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--ksc-light);
+        }
+        .conditional-section.visible { display: block; }
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--ksc-primary);
+            color: white;
+        }
+        .btn-primary:hover { background: #2a1a0f; }
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--ksc-primary);
+            color: var(--ksc-primary);
+        }
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        .alert-info {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            color: #1e40af;
+        }
+        .alert-success {
+            background: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            color: #065f46;
+        }
+        .alert-warning {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+        .policy-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .policy-item {
+            background: white;
+            border: 1px solid #e7e5e4;
+            border-radius: 8px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .policy-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--ksc-primary);
+        }
+        .policy-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: var(--ksc-primary);
+        }
+        .policy-subtitle {
+            font-size: 0.8125rem;
+            color: var(--ksc-secondary);
+        }
+        .signature-pad {
+            width: 100%;
+            height: 200px;
+            border: 2px solid #e7e5e4;
+            border-radius: 8px;
+            background: white;
+            cursor: crosshair;
+        }
+        .btn-clear {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid #e7e5e4;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            margin-top: 0.75rem;
+        }
+        .swms-card {
+            background: white;
+            border: 2px solid #e7e5e4;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .swms-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--ksc-primary);
+        }
+        .swms-card.selected {
+            border-color: var(--ksc-primary);
+            background: var(--ksc-light);
+        }
+        .swms-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: var(--ksc-primary);
+        }
+        .swms-risk {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+        .risk-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .risk-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .swms-preview {
+            background: var(--ksc-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .swms-section {
+            margin-bottom: 1.5rem;
+        }
+        .swms-section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--ksc-primary);
+        }
+        .swms-section ul {
+            list-style: disc;
+            padding-left: 1.5rem;
+            font-size: 0.875rem;
+        }
+        .swms-section li {
+            margin-bottom: 0.5rem;
+        }
+        footer {
+            background: white;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--ksc-secondary);
+            border-top: 1px solid #e7e5e4;
+            margin-top: 2rem;
+        }
+        footer strong {
+            color: var(--ksc-primary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-circle">KSC</div>
+                <div class="app-title">
+                    <h1>Field App</h1>
+                    <p id="client-name">Loading...</p>
+                </div>
+            </div>
+            <button class="back-btn" id="back-btn" onclick="goHome()">← Home</button>
+        </div>
+    </header>
+
+    <main class="content">
+        <!-- HOME SCREEN -->
+        <div id="screen-home" class="screen active">
+            <div class="action-cards">
+                <div class="action-card" onclick="showScreen('incident')">
+                    <div class="card-icon">📝</div>
+                    <div class="card-title">Log Incident</div>
+                    <div class="card-description">Report workplace incidents and near misses</div>
+                </div>
+                <div class="action-card" onclick="showScreen('hazard')">
+                    <div class="card-icon">⚠️</div>
+                    <div class="card-title">Report Hazard</div>
+                    <div class="card-description">Identify and report workplace hazards</div>
+                </div>
+                <div class="action-card" onclick="showScreen('inspection')">
+                    <div class="card-icon">🔍</div>
+                    <div class="card-title">Site Inspection</div>
+                    <div class="card-description">Conduct site audits and inspections</div>
+                </div>
+                <div class="action-card" onclick="showScreen('swms')">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">SWMS Sign-off</div>
+                    <div class="card-description">Review and sign Safe Work Method Statements</div>
+                </div>
+                <div class="action-card" onclick="showScreen('take5')">
+                    <div class="card-icon">✋</div>
+                    <div class="card-title">Complete Take 5</div>
+                    <div class="card-description">Quick pre-task risk assessment</div>
+                </div>
+                <div class="action-card" onclick="showScreen('policies')">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">View Policies</div>
+                    <div class="card-description">Access company policies and procedures</div>
+                </div>
+                <div class="action-card" onclick="showScreen('feedback')">
+                    <div class="card-icon">💬</div>
+                    <div class="card-title">Share Feedback</div>
+                    <div class="card-description">Tell us about your safety culture experience</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INCIDENT SCREEN -->
+        <div id="screen-incident" class="screen">
+            <div class="form-section">
+                <h2 class="section-title">Log Incident</h2>
+                <div class="alert alert-info">Report all incidents immediately, no matter how minor.</div>
+                <div class="form-group">
+                    <label>Date of Incident *</label>
+                    <input type="date" class="form-input" id="incident-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Time *</label>
+                    <input type="time" class="form-input" id="incident-time" required>
+                </div>
+                <div class="form-group">
+                    <label>Area/Location *</label>
+                    <select class="form-select" id="incident-area" required>
+                        <option value="">Select...</option>
+                        <option>Office</option><option>Warehouse</option><option>Workshop</option>
+                        <option>Site - Building A</option><option>Site - Building B</option>
+                        <option>Car Park</option><option>Loading Dock</option><option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Person Involved *</label>
+                    <input type="text" class="form-input" id="incident-person" required>
+                </div>
+                <div class="form-group">
+                    <label>Incident Type *</label>
+                    <select class="form-select" id="incident-type" required>
+                        <option value="">Select...</option>
+                        <option>Injury</option><option>Near Miss</option><option>Property Damage</option>
+                        <option>Environmental</option><option>Security</option><option>Vehicle</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea class="form-textarea" id="incident-description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Was There an Injury? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="incident-injury" value="No" id="injury-no" onchange="toggleInjuryDetails(false)">
+                            <label for="injury-no">No</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="incident-injury" value="Yes" id="injury-yes" onchange="toggleInjuryDetails(true)">
+                            <label for="injury-yes">Yes</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="injury-details" class="conditional-section">
+                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Injury Details</h3>
+                    <div class="form-group">
+                        <label>Body Part *</label>
+                        <select class="form-select" id="injury-bodypart">
+                            <option value="">Select...</option>
+                            <option>Head</option><option>Eye</option><option>Face</option><option>Neck</option>
+                            <option>Shoulder</option><option>Arm</option><option>Hand</option><option>Finger</option>
+                            <option>Back</option><option>Chest</option><option>Leg</option><option>Knee</option>
+                            <option>Ankle</option><option>Foot</option><option>Multiple</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nature of Injury *</label>
+                        <select class="form-select" id="injury-nature">
+                            <option value="">Select...</option>
+                            <option>Cut/Laceration</option><option>Bruise</option><option>Sprain/Strain</option>
+                            <option>Fracture</option><option>Burn</option><option>Eye Injury</option>
+                            <option>Crush</option><option>Electric Shock</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Aggravating Injury? *</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="injury-aggravating" value="No" id="aggr-no">
+                                <label for="aggr-no">No</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="injury-aggravating" value="Yes" id="aggr-yes">
+                                <label for="aggr-yes">Yes</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Treatment *</label>
+                        <select class="form-select" id="injury-treatment">
+                            <option value="">Select...</option>
+                            <option>First Aid Only</option><option>Medical Treatment</option>
+                            <option>Hospital</option><option>Ambulance</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Actions Taken *</label>
+                    <textarea class="form-textarea" id="incident-actions" required></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="submitIncident()">Submit Report</button>
+            </div>
+        </div>
+
+        <!-- HAZARD SCREEN -->
+        <div id="screen-hazard" class="screen">
+            <div class="form-section">
+                <h2 class="section-title">Report Hazard</h2>
+                <div class="alert alert-info">Spot it? Report it!</div>
+                <div class="form-group">
+                    <label>Location *</label>
+                    <select class="form-select" id="hazard-area" required>
+                        <option value="">Select...</option>
+                        <option>Office</option><option>Warehouse</option><option>Site A</option>
+                        <option>Site B</option><option>Car Park</option><option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Hazard Type *</label>
+                    <select class="form-select" id="hazard-type" required>
+                        <option value="">Select...</option>
+                        <option>Slip/Trip/Fall</option><option>Electrical</option><option>Chemical</option>
+                        <option>Manual Handling</option><option>Heights</option><option>Plant/Equipment</option>
+                        <option>Housekeeping</option><option>Fire</option><option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Risk Level *</label>
+                    <div class="radio-group">
+                        <div class="radio-item"><input type="radio" name="hazard-risk" value="Low" id="risk-low"><label for="risk-low">Low</label></div>
+                        <div class="radio-item"><input type="radio" name="hazard-risk" value="Medium" id="risk-medium"><label for="risk-medium">Medium</label></div>
+                        <div class="radio-item"><input type="radio" name="hazard-risk" value="High" id="risk-high"><label for="risk-high">High</label></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea class="form-textarea" id="hazard-description" required></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="submitHazard()">Submit Hazard</button>
+            </div>
+        </div>
+
+        <!-- INSPECTION SCREEN with FULL CHECKLISTS -->
+        <div id="screen-inspection" class="screen">
+            <div class="form-section">
+                <h2 class="section-title">Site Inspection</h2>
+                <div class="alert alert-info">Conduct regular safety inspections</div>
+                <div class="form-group">
+                    <label>Inspection Type *</label>
+                    <select class="form-select" id="inspection-type" onchange="loadChecklist()" required>
+                        <option value="">Select...</option>
+                        <option value="general">General Site (AS 4801)</option>
+                        <option value="scaffolding">Scaffolding (AS/NZS 1576)</option>
+                        <option value="electrical">Electrical (AS/NZS 3000)</option>
+                        <option value="ppe">PPE Compliance (WHS Reg 2011)</option>
+                        <option value="housekeeping">Housekeeping (AS 4801)</option>
+                        <option value="fire">Fire Safety (AS 1851)</option>
+                        <option value="plant">Plant & Equipment (WHS Reg 5.3)</option>
+                        <option value="environmental">Environmental (ISO 14001)</option>
+                        <option value="traffic">Traffic Control (TCAWS/QLD TMR)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Inspector *</label>
+                    <input type="text" class="form-input" id="inspection-inspector" required>
+                </div>
+                <div class="form-group">
+                    <label>Site/Area *</label>
+                    <input type="text" class="form-input" id="inspection-site" required>
+                </div>
+                <div id="inspection-checklist" class="conditional-section"></div>
+                <div class="form-group">
+                    <label>Comments</label>
+                    <textarea class="form-textarea" id="inspection-comments"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="submitInspection()">Complete Inspection</button>
+            </div>
+        </div>
+
+        <!-- SWMS SCREEN - COMPLETE 6-STEP WORKFLOW -->
+        <div id="screen-swms" class="screen">
+            <div id="swms-step-1">
+                <div class="form-section">
+                    <h2 class="section-title">Select SWMS</h2>
+                    <div class="alert alert-info">Select your task to review the SWMS</div>
+                    <div class="swms-card" onclick="selectSWMS('heights', 'Working at Heights')">
+                        <div class="swms-title">Working at Heights</div>
+                        <span class="swms-risk risk-high">High Risk</span>
+                        <p style="font-size:0.875rem;color:#6d5742;margin-top:0.5rem;">Work above 2m - scaffolding, ladders, roofs</p>
+                    </div>
+                    <div class="swms-card" onclick="selectSWMS('electrical', 'Electrical Work')">
+                        <div class="swms-title">Electrical Work</div>
+                        <span class="swms-risk risk-high">High Risk</span>
+                        <p style="font-size:0.875rem;color:#6d5742;margin-top:0.5rem;">Live electrical, installations</p>
+                    </div>
+                    <div class="swms-card" onclick="selectSWMS('excavation', 'Excavation')">
+                        <div class="swms-title">Excavation Work</div>
+                        <span class="swms-risk risk-high">High Risk</span>
+                        <p style="font-size:0.875rem;color:#6d5742;margin-top:0.5rem;">Digging, trenching >1.5m</p>
+                    </div>
+                    <div class="swms-card" onclick="selectSWMS('manual', 'Manual Handling')">
+                        <div class="swms-title">Manual Handling</div>
+                        <span class="swms-risk risk-medium">Medium Risk</span>
+                        <p style="font-size:0.875rem;color:#6d5742;margin-top:0.5rem;">Lifting, carrying tasks</p>
+                    </div>
+                </div>
+            </div>
+            <div id="swms-step-2" style="display:none;">
+                <div class="form-section">
+                    <h2 class="section-title" id="swms-title">SWMS Review</h2>
+                    <div class="alert alert-warning"><strong>READ CAREFULLY</strong> - Understand all hazards before starting</div>
+                    <div class="swms-preview">
+                        <div class="swms-section">
+                            <h4>Key Hazards</h4>
+                            <ul>
+                                <li>Falls from heights (>2m)</li>
+                                <li>Falling objects</li>
+                                <li>Scaffold collapse</li>
+                                <li>Weather conditions</li>
+                            </ul>
+                        </div>
+                        <div class="swms-section">
+                            <h4>Controls Required</h4>
+                            <ul>
+                                <li>Guardrails (min 900mm)</li>
+                                <li>Fall arrest harness</li>
+                                <li>Exclusion zone below</li>
+                                <li>Competent supervision</li>
+                            </ul>
+                        </div>
+                        <div class="swms-section">
+                            <h4>PPE Required</h4>
+                            <ul>
+                                <li>Hard hat (Class 1)</li>
+                                <li>Safety glasses</li>
+                                <li>High-vis (Class D/N)</li>
+                                <li>Steel-capped boots</li>
+                                <li>Fall arrest harness</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;">
+                        <button class="btn btn-secondary" onclick="swmsStep(1)">← Back</button>
+                        <button class="btn btn-primary" onclick="swmsStep(3)">I've Read This →</button>
+                    </div>
+                </div>
+            </div>
+            <div id="swms-step-3" style="display:none;">
+                <div class="form-section">
+                    <h2 class="section-title">Pre-Work Checklist</h2>
+                    <div class="alert alert-warning"><strong>ALL boxes must be checked</strong></div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="check-1" required>
+                            <label for="check-1">I have read and understood this SWMS</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="check-2" required>
+                            <label for="check-2">I have the required licenses/tickets</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="check-3" required>
+                            <label for="check-3">All PPE is available and in good condition</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="check-4" required>
+                            <label for="check-4">Equipment has been inspected</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="check-5" required>
+                            <label for="check-5">I attended today's toolbox talk</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="check-6" required>
+                            <label for="check-6">Emergency procedures are clear</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="check-7" required>
+                            <label for="check-7">All permits obtained</label>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;">
+                        <button class="btn btn-secondary" onclick="swmsStep(2)">← Back</button>
+                        <button class="btn btn-primary" onclick="validateChecklist()">Continue →</button>
+                    </div>
+                </div>
+            </div>
+            <div id="swms-step-4" style="display:none;">
+                <div class="form-section">
+                    <h2 class="section-title">Site Conditions</h2>
+                    <div class="form-group">
+                        <label>Your Name *</label>
+                        <input type="text" class="form-input" id="swms-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <input type="text" class="form-input" id="swms-location" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Supervisor *</label>
+                        <input type="text" class="form-input" id="swms-supervisor" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Time *</label>
+                        <input type="time" class="form-input" id="swms-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Weather</label>
+                        <div class="radio-group">
+                            <div class="radio-item"><input type="radio" name="weather" value="Clear" id="w-clear"><label for="w-clear">Clear</label></div>
+                            <div class="radio-item"><input type="radio" name="weather" value="Rain" id="w-rain"><label for="w-rain">Rain</label></div>
+                            <div class="radio-item"><input type="radio" name="weather" value="Wind" id="w-wind"><label for="w-wind">Windy</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Additional Hazards</label>
+                        <textarea class="form-textarea" id="swms-hazards"></textarea>
+                    </div>
+                    <div style="display:flex;gap:1rem;">
+                        <button class="btn btn-secondary" onclick="swmsStep(3)">← Back</button>
+                        <button class="btn btn-primary" onclick="swmsStep(5)">Continue →</button>
+                    </div>
+                </div>
+            </div>
+            <div id="swms-step-5" style="display:none;">
+                <div class="form-section">
+                    <h2 class="section-title">Sign to Confirm</h2>
+                    <div class="alert alert-info">
+                        <strong>By signing you confirm:</strong><br>
+                        • You've read and understood this SWMS<br>
+                        • You'll follow all controls and use PPE<br>
+                        • You'll stop work if unsafe<br>
+                        • You'll report incidents
+                    </div>
+                    <div class="form-group">
+                        <label>Sign Here *</label>
+                        <canvas id="signature-pad" class="signature-pad"></canvas>
+                        <button class="btn-clear" onclick="clearSignature()">Clear</button>
+                    </div>
+                    <div style="display:flex;gap:1rem;">
+                        <button class="btn btn-secondary" onclick="swmsStep(4)">← Back</button>
+                        <button class="btn btn-success" onclick="submitSWMS()">✓ Submit</button>
+                    </div>
+                </div>
+            </div>
+            <div id="swms-step-6" style="display:none;">
+                <div class="form-section">
+                    <div class="alert alert-success"><strong style="font-size:1.25rem;">✓ SWMS Complete</strong></div>
+                    <div style="background:var(--ksc-light);padding:1.5rem;border-radius:8px;margin:1.5rem 0;">
+                        <p><strong>Reference:</strong> <span id="swms-ref"></span></p>
+                        <p><strong>Worker:</strong> <span id="swms-worker"></span></p>
+                        <p><strong>Time:</strong> <span id="swms-timestamp"></span></p>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>You may now commence work safely.</strong><br><br>
+                        Remember: Stop if conditions change, report all hazards
+                    </div>
+                    <button class="btn btn-primary" onclick="goHome()">← Back to Home</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAKE 5 SCREEN - COMPLETE -->
+        <div id="screen-take5" class="screen">
+            <div class="form-section">
+                <h2 class="section-title">Take 5 Safety Check</h2>
+                <div class="alert alert-info">Stop and think before you start - 5 minutes could save your life</div>
+                <div class="form-group">
+                    <label>Your Name *</label>
+                    <input type="text" class="form-input" id="take5-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Task *</label>
+                    <input type="text" class="form-input" id="take5-task" required>
+                </div>
+                <div class="form-group">
+                    <label>Location *</label>
+                    <input type="text" class="form-input" id="take5-location" required>
+                </div>
+                <div class="form-section">
+                    <h3 style="font-size:1rem;margin-bottom:1rem;">Complete All 5 Checks:</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="take5-1" required>
+                            <label for="take5-1"><strong>1. STOP</strong> - I have stopped and thought about the task</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="take5-2" required>
+                            <label for="take5-2"><strong>2. LOOK</strong> - I have looked for hazards in my work area</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="take5-3" required>
+                            <label for="take5-3"><strong>3. ASSESS</strong> - I have assessed the risks and controls</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="take5-4" required>
+                            <label for="take5-4"><strong>4. CONTROL</strong> - Controls are in place (PPE, barriers, permits)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="take5-5" required>
+                            <label for="take5-5"><strong>5. MONITOR</strong> - I will watch for changing conditions</label>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="submitTake5()">Submit Take 5</button>
+            </div>
+        </div>
+
+        <!-- POLICIES SCREEN - PDF LINKS -->
+        <div id="screen-policies" class="screen">
+            <div class="form-section">
+                <h2 class="section-title">Policies & Procedures</h2>
+                <div class="alert alert-info">Tap any policy to open the PDF</div>
+                <div class="policy-list">
+                    <div class="policy-item" onclick="openPolicy('whs-policy.pdf')">
+                        <div class="policy-title">📄 WHS Policy</div>
+                        <div class="policy-subtitle">Last updated: January 2026 • Tap to view PDF</div>
+                    </div>
+                    <div class="policy-item" onclick="openPolicy('incident-reporting.pdf')">
+                        <div class="policy-title">📄 Incident Reporting Procedure</div>
+                        <div class="policy-subtitle">Last updated: January 2026 • Tap to view PDF</div>
+                    </div>
+                    <div class="policy-item" onclick="openPolicy('ppe-policy.pdf')">
+                        <div class="policy-title">📄 PPE Policy</div>
+                        <div class="policy-subtitle">Last updated: December 2025 • Tap to view PDF</div>
+                    </div>
+                    <div class="policy-item" onclick="openPolicy('drug-alcohol.pdf')">
+                        <div class="policy-title">📄 Drug & Alcohol Policy</div>
+                        <div class="policy-subtitle">Last updated: November 2025 • Tap to view PDF</div>
+                    </div>
+                    <div class="policy-item" onclick="openPolicy('emergency-procedures.pdf')">
+                        <div class="policy-title">📄 Emergency Procedures</div>
+                        <div class="policy-subtitle">Last updated: December 2025 • Tap to view PDF</div>
+                    </div>
+                    <div class="policy-item" onclick="openPolicy('swms-procedure.pdf')">
+                        <div class="policy-title">📄 SWMS Procedure</div>
+                        <div class="policy-subtitle">Last updated: January 2026 • Tap to view PDF</div>
+                    </div>
+                </div>
+                <div class="alert alert-warning" style="margin-top:1.5rem;">
+                    <strong>Note:</strong> PDFs will be hosted on your Google Drive or company server. Update the links in the code to point to your policy documents.
+                </div>
+            </div>
+        </div>
+
+        <!-- FEEDBACK SCREEN -->
+        <div id="screen-feedback" class="screen">
+            <div class="form-section">
+                <h2 class="section-title">Share Feedback</h2>
+                <div class="alert alert-info">Your feedback helps us improve</div>
+                <div class="form-group">
+                    <label>Topic *</label>
+                    <select class="form-select" id="feedback-topic" required>
+                        <option value="">Select...</option>
+                        <option>Safety</option><option>Equipment</option><option>Training</option>
+                        <option>Communication</option><option>Management</option><option>Positive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Rating *</label>
+                    <div class="radio-group">
+                        <div class="radio-item"><input type="radio" name="feedback-rating" value="5" id="r-5"><label for="r-5">😄</label></div>
+                        <div class="radio-item"><input type="radio" name="feedback-rating" value="4" id="r-4"><label for="r-4">🙂</label></div>
+                        <div class="radio-item"><input type="radio" name="feedback-rating" value="3" id="r-3"><label for="r-3">😐</label></div>
+                        <div class="radio-item"><input type="radio" name="feedback-rating" value="2" id="r-2"><label for="r-2">☹️</label></div>
+                        <div class="radio-item"><input type="radio" name="feedback-rating" value="1" id="r-1"><label for="r-1">😠</label></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Your Feedback *</label>
+                    <textarea class="form-textarea" id="feedback-text" required></textarea>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="feedback-anonymous">
+                        <label for="feedback-anonymous">Submit anonymously</label>
+                    </div>
+                </div>
+                <div id="feedback-name-section" class="form-group">
+                    <label>Name (Optional)</label>
+                    <input type="text" class="form-input" id="feedback-name">
+                </div>
+                <button class="btn btn-primary" onclick="submitFeedback()">Submit Feedback</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>Powered by <strong>King Strategies Consulting</strong></footer>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+        const CLIENT_NAME = 'ABC Construction Pty Ltd';
+        document.getElementById('client-name').textContent = CLIENT_NAME;
+        const today = new Date().toISOString().split('T')[0];
+        if(document.getElementById('incident-date')) document.getElementById('incident-date').value = today;
+
+        let selectedSWMSId = '';
+        let selectedSWMSName = '';
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + id).classList.add('active');
+            document.getElementById('back-btn').classList.add('visible');
+            window.scrollTo(0,0);
+        }
+
+        function goHome() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-home').classList.add('active');
+            document.getElementById('back-btn').classList.remove('visible');
+            window.scrollTo(0,0);
+        }
+
+        function toggleInjuryDetails(show) {
+            document.getElementById('injury-details').classList.toggle('visible', show);
+        }
+
+        function loadChecklist() {
+            const type = document.getElementById('inspection-type').value;
+            const container = document.getElementById('inspection-checklist');
+            if(!type) { container.classList.remove('visible'); return; }
+            container.classList.add('visible');
+
+            const checklists = {
+                general: [
+                    'Site clean and organized (AS 4801)',
+                    'PPE worn correctly (WHS Reg 2011)',
+                    'Emergency exits clear and marked',
+                    'First aid kit accessible and stocked',
+                    'Fire extinguishers in place and tagged',
+                    'Signage visible and compliant',
+                    'Walkways clear of obstructions'
+                ],
+                scaffolding: [
+                    'Scaffolding tagged green (AS/NZS 1576)',
+                    'Guardrails installed (min 900mm height)',
+                    'Mid-rails and toe boards in place',
+                    'Access ladder secured',
+                    'Base plates on firm ground',
+                    'Scaffold ties to structure',
+                    'No damage to scaffold components'
+                ],
+                electrical: [
+                    'RCDs tested and tagged (AS/NZS 3760)',
+                    'Leads and cords undamaged',
+                    'No temporary wiring or double adapters',
+                    'Switchboards labeled correctly',
+                    'Electrical work permits obtained',
+                    'Isolation procedures followed',
+                    'Test and tag records current'
+                ],
+                ppe: [
+                    'Hard hats worn (no damage/cracks)',
+                    'Safety glasses/goggles as required',
+                    'High-vis clothing (Class D/N)',
+                    'Steel-capped boots worn',
+                    'Hearing protection where required',
+                    'Gloves appropriate to task',
+                    'Harnesses inspected if required'
+                ],
+                housekeeping: [
+                    'Work areas clean and tidy',
+                    'Materials stored correctly',
+                    'Waste disposed in designated areas',
+                    'Spills cleaned immediately',
+                    'Tools returned to storage',
+                    'Access routes clear',
+                    'Adequate lighting in work areas'
+                ],
+                fire: [
+                    'Fire extinguishers accessible (AS 1851)',
+                    'Fire extinguishers tagged (6-monthly)',
+                    'Emergency exits clearly marked',
+                    'Fire evacuation plan displayed',
+                    'Flammable materials stored correctly',
+                    'Smoking in designated areas only',
+                    'Hot work permits issued where required'
+                ],
+                plant: [
+                    'Plant pre-start checks completed',
+                    'Operators licensed and competent',
+                    'Guards and safety devices functional',
+                    'Maintenance records up to date',
+                    'Exclusion zones established',
+                    'Plant isolation procedures followed',
+                    'Defect reporting system in use'
+                ],
+                environmental: [
+                    'Sediment controls in place',
+                    'Erosion controls effective',
+                    'Waste segregation practiced',
+                    'Spill kits accessible',
+                    'Noise controls implemented',
+                    'Dust suppression measures active',
+                    'Environmental incidents reported'
+                ],
+                traffic: [
+                    'TCAWS implemented (MUTCD compliant)',
+                    'Signage positioned per QLD TMR standards',
+                    'Traffic controllers licensed (AS 1742.3)',
+                    'High-vis worn (Class D/N day/night)',
+                    'Two-way communication operational',
+                    'STOP/SLOW bats compliant size (450mm)',
+                    'Delineation appropriate for speed zone',
+                    'Advance warning signs at required distances',
+                    'Lighting adequate for night work',
+                    'Emergency procedures communicated'
+                ]
+            };
+
+            const items = checklists[type] || [];
+            let html = '<h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem;">Inspection Checklist</h3><div class="checkbox-group">';
+            items.forEach((item, i) => {
+                html += `<div class="checkbox-item"><input type="checkbox" id="check-${i}" class="inspection-check"><label for="check-${i}">${item}</label></div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function selectSWMS(id, name) {
+            selectedSWMSId = id;
+            selectedSWMSName = name;
+            document.getElementById('swms-title').textContent = name;
+            swmsStep(2);
+        }
+
+        function swmsStep(step) {
+            for(let i=1; i<=6; i++) {
+                const el = document.getElementById('swms-step-'+i);
+                if(el) el.style.display = 'none';
+            }
+            const target = document.getElementById('swms-step-'+step);
+            if(target) {
+                target.style.display = 'block';
+                window.scrollTo(0,0);
+            }
+            if(step === 5) setTimeout(initSignature, 100);
+        }
+
+        function validateChecklist() {
+            const checks = document.querySelectorAll('#swms-step-3 input[type="checkbox"]');
+            if(!Array.from(checks).every(c => c.checked)) {
+                alert('All boxes must be checked. If you cannot, speak to your supervisor.');
+                return;
+            }
+            swmsStep(4);
+        }
+
+        function initSignature() {
+            const canvas = document.getElementById('signature-pad');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 200;
+            let drawing = false;
+
+            function startDraw(e) { drawing = true; draw(e); }
+            function draw(e) {
+                if (!drawing) return;
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = '#3d2817';
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
+            function stopDraw() { drawing = false; ctx.beginPath(); }
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDraw);
+            canvas.addEventListener('touchstart', startDraw);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', stopDraw);
+        }
+
+        function clearSignature() {
+            const canvas = document.getElementById('signature-pad');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function openPolicy(filename) {
+            alert(`Opening policy: ${filename}\n\nUpdate the code to link to your actual PDF URLs hosted on Google Drive or your server.`);
+            // window.open('YOUR_GOOGLE_DRIVE_POLICY_URL_HERE', '_blank');
+        }
+
+        document.getElementById('feedback-anonymous')?.addEventListener('change', function() {
+            document.getElementById('feedback-name-section').style.display = this.checked ? 'none' : 'block';
+        });
+
+        function submitIncident() {
+            const injury = document.querySelector('input[name="incident-injury"]:checked');
+            if(!injury) { alert('Please indicate if there was an injury'); return; }
+            const data = {
+                action: 'submitIncident',
+                date: document.getElementById('incident-date').value,
+                time: document.getElementById('incident-time').value,
+                area: document.getElementById('incident-area').value,
+                person: document.getElementById('incident-person').value,
+                type: document.getElementById('incident-type').value,
+                description: document.getElementById('incident-description').value,
+                injury: injury.value,
+                actions: document.getElementById('incident-actions').value,
+                client: CLIENT_NAME
+            };
+            if(injury.value === 'Yes') {
+                data.bodyPart = document.getElementById('injury-bodypart').value;
+                data.injuryNature = document.getElementById('injury-nature').value;
+                data.aggravating = document.querySelector('input[name="injury-aggravating"]:checked')?.value;
+                data.treatment = document.getElementById('injury-treatment').value;
+            }
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(() => { alert('✓ Incident reported'); goHome(); }).catch(err => { alert('Error'); console.error(err); });
+        }
+
+        function submitHazard() {
+            const risk = document.querySelector('input[name="hazard-risk"]:checked');
+            if(!risk) { alert('Select risk level'); return; }
+            const data = {
+                action: 'submitHazard',
+                area: document.getElementById('hazard-area').value,
+                type: document.getElementById('hazard-type').value,
+                risk: risk.value,
+                description: document.getElementById('hazard-description').value,
+                client: CLIENT_NAME
+            };
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(() => { alert('✓ Hazard reported'); goHome(); }).catch(err => { alert('Error'); console.error(err); });
+        }
+
+        function submitInspection() {
+            const checks = document.querySelectorAll('.inspection-check');
+            const total = checks.length;
+            const passed = Array.from(checks).filter(c => c.checked).length;
+            const data = {
+                action: 'submitInspection',
+                type: document.getElementById('inspection-type').value,
+                inspector: document.getElementById('inspection-inspector').value,
+                site: document.getElementById('inspection-site').value,
+                total, passed,
+                passRate: total > 0 ? Math.round((passed/total)*100) : 0,
+                comments: document.getElementById('inspection-comments').value,
+                client: CLIENT_NAME
+            };
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(() => { alert(`✓ Inspection complete\nPass Rate: ${data.passRate}%`); goHome(); }).catch(err => { alert('Error'); console.error(err); });
+        }
+
+        function submitSWMS() {
+            const canvas = document.getElementById('signature-pad');
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+            if(!imgData.data.some(c => c !== 0)) { alert('Please sign'); return; }
+            const data = {
+                action: 'submitSWMS',
+                swmsId: selectedSWMSId,
+                task: selectedSWMSName,
+                name: document.getElementById('swms-name').value,
+                location: document.getElementById('swms-location').value,
+                supervisor: document.getElementById('swms-supervisor').value,
+                time: document.getElementById('swms-time').value,
+                weather: document.querySelector('input[name="weather"]:checked')?.value,
+                hazards: document.getElementById('swms-hazards').value,
+                signature: canvas.toDataURL(),
+                client: CLIENT_NAME
+            };
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(() => {
+                const ref = 'SWMS-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*100000)).padStart(5,'0');
+                document.getElementById('swms-ref').textContent = ref;
+                document.getElementById('swms-worker').textContent = data.name;
+                document.getElementById('swms-timestamp').textContent = new Date().toLocaleTimeString();
+                swmsStep(6);
+            }).catch(err => { alert('Error'); console.error(err); });
+        }
+
+        function submitTake5() {
+            const checks = document.querySelectorAll('#screen-take5 input[type="checkbox"]');
+            if(!Array.from(checks).every(c => c.checked)) { alert('Complete all 5 checks'); return; }
+            const data = {
+                action: 'submitTake5',
+                name: document.getElementById('take5-name').value,
+                task: document.getElementById('take5-task').value,
+                location: document.getElementById('take5-location').value,
+                client: CLIENT_NAME
+            };
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(() => { alert('✓ Take 5 completed'); goHome(); }).catch(err => { alert('Error'); console.error(err); });
+        }
+
+        function submitFeedback() {
+            const rating = document.querySelector('input[name="feedback-rating"]:checked');
+            if(!rating) { alert('Select rating'); return; }
+            const anon = document.getElementById('feedback-anonymous').checked;
+            const data = {
+                action: 'submitFeedback',
+                topic: document.getElementById('feedback-topic').value,
+                rating: rating.value,
+                feedback: document.getElementById('feedback-text').value,
+                name: anon ? 'Anonymous' : (document.getElementById('feedback-name').value || 'Anonymous'),
+                anonymous: anon,
+                client: CLIENT_NAME
+            };
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(() => { alert('✓ Thank you for feedback'); goHome(); }).catch(err => { alert('Error'); console.error(err); });
+        }
+    </script>
+</body>
+</html>
